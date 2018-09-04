@@ -32,18 +32,28 @@
     <script src="/socket.io/socket.io.js"></script>
 	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 	<script>
-		for (var i = 0; i >= 100; i++) {
+		for (var i = 1; i <= 10; i++) {
 			$('#select').append($('<option>').text(i));
 		}
+
+		var pseudo = prompt('Quel est votre pseudo ?');
+		var room = Math.floor((Math.random() * 10) + 1);
+		$('#select').val(room);
 
 	  $(function () {
 	    var socket = io();
 
-	    var pseudo = prompt('Quel est votre pseudo ?');
         socket.emit('pseudo', pseudo);
-
-        var room = prompt('Quel salon voulez-vous rejoindre ?');
+        
         socket.emit('room', room);
+
+        $('#select').change(function(){
+		    var room = $('#select').val();
+		    socket.emit('room', room);
+		    $('#messages').append('Vous avez rejoint le salon ' + room + ' !');
+		})
+
+        $('#messages').append('Vous avez rejoint le salon ' + room + ' !');
 
 	    $('form').submit(function(){
 	      socket.emit('message', $('#m').val());
