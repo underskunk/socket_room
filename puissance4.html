@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test de Puissance 4</title>
+</head>
+<body>
+<canvas id="myCanvas" width="700" height="600" onclick="mouse_pos(event)"></canvas>
+<p id="demo"></p>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+	var canvas = document.getElementById("myCanvas");
+	var ctx = canvas.getContext("2d");
+	ctx.imageSmoothingEnabled = true;
+	var c = confirm('Veux-tu du rouge ?');
+	var couleur;
+	var tab;
+
+	var socket = io();
+	socket.emit('connection');
+	socket.on('connection', function(data){
+	      tab = data;
+	      affichage();
+	});
+	socket.on('tab', function(data){
+	      tab = data;
+	      affichage();
+	});
+
+	if (c == true) {
+		couleur = 1;
+	} else {
+		couleur = 2;
+	}
+	
+	/*var tab = new Array();
+	for (var i = 0; i < 7; i++) {
+		tab[i] = new Array()
+		for (var j = 0; j < 6; j++) {
+			tab[i][j] = 0;
+		}
+	}*/
+
+	var Case = {
+		haut : 100,
+		larg : 100,
+		tracer : function(x, y) {
+			
+			ctx.moveTo(x, y);
+			ctx.lineTo(x + this.larg, y);
+			ctx.lineTo(x + this.larg, y + this.haut);
+			ctx.lineTo(x, y + this.haut);
+			ctx.lineTo(x, y);
+			ctx.stroke();
+		}
+	}
+	var RondRouge = {
+		tracer : function(x, y) {
+			ctx.beginPath();
+	    	ctx.arc(x,y,40,0,2*Math.PI);
+	    	ctx.fillStyle = "red";
+			ctx.fill();
+		}
+	}
+
+	var RondJaune = {
+		tracer : function(x, y) {
+			ctx.beginPath();
+	    	ctx.arc(x,y,40,0,2*Math.PI);
+	    	ctx.fillStyle = "yellow";
+			ctx.fill();
+		}
+	}
+
+	function affichage () {
+      	var case1 = Object.create(Case);
+		var rond1 = Object.create(RondRouge);
+		var rond2 = Object.create(RondJaune);
+		for (var i = 0 ; i < 7; i++) {
+			for (var j = 0; j < 6; j++) {
+				case1.tracer(i * 100, j * 100);
+				if (tab[i][j] == 1) {
+					rond1.tracer(i * 100 + 50, j * 100 + 50);
+				}else if (tab[i][j] == 2) {
+					rond2.tracer(i * 100 + 50, j * 100 + 50);
+				}
+			}
+		}
+	}
+
+	function ajout(x){
+		for (var j = 0 ; j < 5; j++) {
+			var h = j + 1;
+			if ((tab[x][h] == 1) || (tab[x][h] == 2)) {
+				if (couleur == 1) {
+					tab[x][j] = 1;
+				} else if (couleur == 2){
+					tab[x][j] = 2;
+				}
+			}
+		}
+		if (tab[x][5] == 0) {
+			if (couleur == 1) {
+				tab[x][5] = 1;
+			} else if (couleur == 2){
+				tab[x][5] = 2;
+			}
+		}
+		socket.emit('tab', tab);
+	}
+
+	function mouse_pos(event) {
+		var canvas = document.getElementById("myCanvas");
+		var ctx = canvas.getContext("2d");
+		var x = event.clientX;
+	    var y = event.clientY;
+	    var resX = parseInt(x / 100);
+	    
+	    switch (resX) {
+	    	case 0 :
+	    		ajout(resX);
+	    		break;
+	    	case 1 :
+	    		ajout(resX);
+	    		break;
+	    	case 2 :
+	    		ajout(resX);
+	    		
+	    		break;
+	    	case 3 :
+	    		ajout(resX);
+	    		
+	    		break;
+	    	case 4 :
+	    		ajout(resX);	    		
+	    		break;
+	    	case 5 :
+	    		ajout(resX);
+	    		break;
+	    	case 6 :
+	    		ajout(resX);
+	    		break;
+		}   	
+		affichage();		
+	}
+	affichage();
+	/*$(function () {
+		var socket = io();
+		socket.on('tab', function(data){
+	      tab = data;
+	      affichage();
+	    });
+	});*/
+	
+</script>
+</body>
+</html>
